@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react';
 import { Calendar, MapPin, ArrowLeft, Guitar } from 'lucide-react';
 import Link from 'next/link';
 
-const eventsData = {
+const eventsData: { [key: number]: any } = {
   1: { title: "Oliver Anthony", date: "August 30, 2026", venue: "Joan Perry Brock Center", city: "Farmville, VA", price: 79, image: "https://picsum.photos/id/1015/800/600", genre: "Country" },
   2: { title: "Tyler Childers", date: "July 12, 2026", venue: "Red Rocks Amphitheatre", city: "Morrison, CO", price: 65, image: "https://picsum.photos/id/1074/800/600", genre: "Country" },
   3: { title: "Zach Bryan", date: "September 15, 2026", venue: "Madison Square Garden", city: "New York, NY", price: 89, image: "https://picsum.photos/id/201/800/600", genre: "Country" },
   4: { title: "Working Man's Revival", date: "June 20, 2026", venue: "Salt Shed", city: "Chicago, IL", price: 45, image: "https://picsum.photos/id/106/800/600", genre: "Bluegrass" },
-  // ... (other events are in events page)
+  5: { title: "Colter Wall", date: "July 25, 2026", venue: "The Fillmore", city: "San Francisco, CA", price: 55, image: "https://picsum.photos/id/133/800/600", genre: "Folk" },
+  6: { title: "Chris Stapleton", date: "August 15, 2026", venue: "United Center", city: "Chicago, IL", price: 95, image: "https://picsum.photos/id/180/800/600", genre: "Southern Rock" },
+  7: { title: "Lynyrd Skynyrd Farewell Tour", date: "October 10, 2026", venue: "Ameris Bank Amphitheatre", city: "Atlanta, GA", price: 75, image: "https://picsum.photos/id/201/800/600", genre: "Southern Rock" },
+  8: { title: "The Black Crowes", date: "July 18, 2026", venue: "House of Blues", city: "Chicago, IL", price: 60, image: "https://picsum.photos/id/251/800/600", genre: "Blues Rock" },
 };
 
 export default function EventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -19,12 +22,13 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
 
   useEffect(() => {
     params.then(p => {
-      const ev = eventsData[parseInt(p.id)];
-      setEvent(ev);
+      const id = parseInt(p.id);
+      const ev = eventsData[id];
+      setEvent(ev || null);
     });
   }, [params]);
 
-  if (!event) return <div className="text-center py-20">Loading...</div>;
+  if (!event) return <div className="text-center py-20 text-2xl">Event not found</div>;
 
   const subtotal = event.price * selectedTickets;
   const fee = 1.99;
@@ -33,7 +37,6 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
   const handleCheckout = () => {
     setIsCheckingOut(true);
 
-    // Save ticket to localStorage
     const newTicket = {
       id: Date.now(),
       eventTitle: event.title,
@@ -48,7 +51,7 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
     localStorage.setItem('myTickets', JSON.stringify([newTicket, ...existing]));
 
     setTimeout(() => {
-      alert(`✅ Purchase Successful!\n\n${selectedTickets} tickets to ${event.title}\nTotal: $${total.toFixed(2)}\n\nTickets saved to My Tickets.`);
+      alert(`✅ Purchase Successful!\n\n${selectedTickets} tickets to ${event.title}\nTotal: $${total.toFixed(2)}\n\nSaved to My Tickets.`);
       setIsCheckingOut(false);
     }, 1000);
   };
@@ -85,8 +88,11 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
               <label className="block text-zinc-400 mb-3">Number of Tickets</label>
               <div className="flex gap-3">
                 {[1,2,3,4].map(n => (
-                  <button key={n} onClick={() => setSelectedTickets(n)}
-                    className={`px-8 py-5 rounded-2xl border text-2xl font-semibold ${selectedTickets === n ? 'bg-red-600 border-red-600' : 'border-zinc-700 hover:border-zinc-500'}`}>
+                  <button 
+                    key={n} 
+                    onClick={() => setSelectedTickets(n)}
+                    className={`px-8 py-5 rounded-2xl border text-2xl font-semibold transition-all ${selectedTickets === n ? 'bg-red-600 border-red-600' : 'border-zinc-700 hover:border-zinc-500'}`}
+                  >
                     {n}
                   </button>
                 ))}
