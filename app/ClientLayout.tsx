@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Download, Guitar } from 'lucide-react';
+import { Download, Guitar, Menu, X } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [showInstallButton, setShowInstallButton] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
@@ -18,7 +19,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     };
 
     window.addEventListener('beforeinstallprompt', handler);
-
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
@@ -26,9 +26,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setShowInstallButton(false);
-    }
+    if (outcome === 'accepted') setShowInstallButton(false);
     setDeferredPrompt(null);
   };
 
@@ -46,39 +44,59 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
               <p className="text-sm text-zinc-400 -mt-1">Real Music • Real Low Fees</p>
             </div>
           </div>
-          
-          <nav className="flex gap-8 text-sm font-medium">
+
+          {/* Hamburger Button */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-white p-2 focus:outline-none"
+          >
+            {menuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
+          </button>
+        </div>
+
+        {/* Dropdown Menu with Smooth Slide Animation */}
+        <div 
+          className={`overflow-hidden transition-all duration-300 ease-in-out bg-zinc-900 border-t border-zinc-800 ${
+            menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+          }`}
+        >
+          <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col gap-6 text-lg">
             <Link 
               href="/" 
-              className={`hover:text-red-500 transition-colors ${isActive('/') ? 'text-red-500' : 'text-zinc-300'}`}
+              onClick={() => setMenuOpen(false)} 
+              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
             >
               Home
             </Link>
             <Link 
               href="/events" 
-              className={`hover:text-red-500 transition-colors ${isActive('/events') ? 'text-red-500' : 'text-zinc-300'}`}
+              onClick={() => setMenuOpen(false)} 
+              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/events') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
             >
               All Events
             </Link>
             <Link 
               href="/my-tickets" 
-              className={`hover:text-red-500 transition-colors ${isActive('/my-tickets') ? 'text-red-500' : 'text-zinc-300'}`}
+              onClick={() => setMenuOpen(false)} 
+              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/my-tickets') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
             >
               My Tickets
             </Link>
             <Link 
               href="/artist" 
-              className={`hover:text-red-500 transition-colors ${isActive('/artist') ? 'text-red-500' : 'text-zinc-300'}`}
+              onClick={() => setMenuOpen(false)} 
+              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/artist') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
             >
               For Artists
             </Link>
             <Link 
               href="/legal" 
-              className={`hover:text-red-500 transition-colors ${isActive('/legal') ? 'text-red-500' : 'text-zinc-300'}`}
+              onClick={() => setMenuOpen(false)} 
+              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/legal') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
             >
               Legal
             </Link>
-          </nav>
+          </div>
         </div>
       </header>
 
