@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, MapPin, ArrowLeft, Guitar } from 'lucide-react';
+import { Calendar, MapPin, ArrowLeft, Guitar, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
 const eventsData: { [key: number]: any } = {
@@ -18,7 +18,18 @@ const eventsData: { [key: number]: any } = {
 export default function EventPage({ params }: { params: Promise<{ id: string }> }) {
   const [selectedTickets, setSelectedTickets] = useState(2);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
   const [event, setEvent] = useState<any>(null);
+
+  // Form fields
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    cardNumber: "",
+    expiry: "",
+    cvv: "",
+    zip: ""
+  });
 
   useEffect(() => {
     params.then(p => {
@@ -30,11 +41,18 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
 
   if (!event) return <div className="text-center py-20 text-2xl">Event not found</div>;
 
-  const subtotal = event.price * selectedTickets;
-  const fee = 1.99;
-  const total = subtotal + fee;
+  const ticketPrice = event.price;
+  const feePerTicket = 1.99;
+  const subtotal = ticketPrice * selectedTickets;
+  const totalFees = feePerTicket * selectedTickets;
+  const total = subtotal + totalFees;
 
   const handleCheckout = () => {
+    if (!formData.name || !formData.email || !formData.cardNumber) {
+      alert("Please fill in Name, Email, and Card Number");
+      return;
+    }
+
     setIsCheckingOut(true);
 
     const newTicket = {
@@ -44,16 +62,18 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
       venue: event.venue,
       city: event.city,
       quantity: selectedTickets,
-      totalPaid: total
+      totalPaid: total,
+      feePerTicket: feePerTicket
     };
 
     const existing = JSON.parse(localStorage.getItem('myTickets') || '[]');
     localStorage.setItem('myTickets', JSON.stringify([newTicket, ...existing]));
 
     setTimeout(() => {
-      alert(`✅ Purchase Successful!\n\n${selectedTickets} tickets to ${event.title}\nTotal: $${total.toFixed(2)}\n\nSaved to My Tickets.`);
+      alert(`✅ Payment Successful!\n\nThank you, ${formData.name}!\n\n${selectedTickets} tickets to ${event.title}\nTotal charged: $${total.toFixed(2)}\n\nTickets sent to ${formData.email}`);
       setIsCheckingOut(false);
-    }, 1000);
+      setShowCheckoutForm(false);
+    }, 1500);
   };
 
   return (
@@ -72,6 +92,7 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
 
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid lg:grid-cols-2 gap-12">
+          {/* Left - Event Info */}
           <div>
             <img src={event.image} alt={event.title} className="w-full rounded-2xl" />
             <div className="mt-8 space-y-4 text-lg">
@@ -80,40 +101,96 @@ export default function EventPage({ params }: { params: Promise<{ id: string }> 
             </div>
           </div>
 
+          {/* Right - Checkout */}
           <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-10">
             <h2 className="text-4xl font-bold mb-2">{event.title}</h2>
             <p className="text-red-500 mb-8">{event.genre}</p>
 
-            <div className="mb-10">
-              <label className="block text-zinc-400 mb-3">Number of Tickets</label>
-              <div className="flex gap-3">
-                {[1,2,3,4].map(n => (
-                  <button 
-                    key={n} 
-                    onClick={() => setSelectedTickets(n)}
-                    className={`px-8 py-5 rounded-2xl border text-2xl font-semibold transition-all ${selectedTickets === n ? 'bg-red-600 border-red-600' : 'border-zinc-700 hover:border-zinc-500'}`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {!showCheckoutForm ? (
+              <>
+                <div className="mb-10">
+                  <label className="block text-zinc-400 mb-3">Number of Tickets</label>
+                  <div className="flex gap-3">
+                    {[1,2,3,4].map(n => (
+                      <button 
+                        key={n} 
+                        onClick={() => setSelectedTickets(n)}
+                        className={`px-8 py-5 rounded-2xl border text-2xl font-semibold transition-all ${selectedTickets === n ? 'bg-red-600 border-red-600' : 'border-zinc-700 hover:border-zinc-500'}`}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            <div className="space-y-4 text-lg border-t border-zinc-800 pt-8">
-              <div className="flex justify-between"><span>Tickets × ${event.price}</span><span>${subtotal}</span></div>
-              <div className="flex justify-between"><span>Lowkey Flat Fee</span><span className="text-green-400">$1.99</span></div>
-              <div className="flex justify-between text-3xl font-bold pt-4 border-t border-zinc-700">
-                <span>Total</span><span>${total.toFixed(2)}</span>
-              </div>
-            </div>
+                <div className="space-y-4 text-lg border-t border-zinc-800 pt-8">
+                  <div className="flex justify-between"><span>Tickets ({selectedTickets} × ${ticketPrice})</span><span>${subtotal}</span></div>
+                  <div className="flex justify-between"><span>Lowkey Fee (${feePerTicket} per ticket)</span><span className="text-green-400">${totalFees.toFixed(2)}</span></div>
+                  <div className="flex justify-between text-3xl font-bold pt-6 border-t border-zinc-700">
+                    <span>Total</span><span>${total.toFixed(2)}</span>
+                  </div>
+                </div>
 
-            <button
-              onClick={handleCheckout}
-              disabled={isCheckingOut}
-              className="w-full mt-12 bg-red-600 hover:bg-red-700 py-7 text-2xl font-semibold rounded-2xl disabled:opacity-70"
-            >
-              {isCheckingOut ? "Processing..." : `Buy Tickets - Pay $${total.toFixed(2)}`}
-            </button>
+                <button
+                  onClick={() => setShowCheckoutForm(true)}
+                  className="w-full mt-12 bg-red-600 hover:bg-red-700 py-7 text-2xl font-semibold rounded-2xl"
+                >
+                  Continue to Checkout
+                </button>
+              </>
+            ) : (
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 text-xl font-semibold">
+                  <CreditCard className="w-6 h-6" /> Secure Checkout
+                </div>
+
+                <input
+                  type="text" placeholder="Full Name" value={formData.name}
+                  onChange={(e) => setFormData({...formData, name: e.target.value})}
+                  className="w-full bg-zinc-950 border border-zinc-700 p-4 rounded-xl"
+                />
+
+                <input
+                  type="email" placeholder="Email Address" value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  className="w-full bg-zinc-950 border border-zinc-700 p-4 rounded-xl"
+                />
+
+                <input
+                  type="text" placeholder="Card Number (4242 4242 4242 4242)" value={formData.cardNumber}
+                  onChange={(e) => setFormData({...formData, cardNumber: e.target.value})}
+                  className="w-full bg-zinc-950 border border-zinc-700 p-4 rounded-xl"
+                />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <input
+                    type="text" placeholder="MM/YY" value={formData.expiry}
+                    onChange={(e) => setFormData({...formData, expiry: e.target.value})}
+                    className="bg-zinc-950 border border-zinc-700 p-4 rounded-xl"
+                  />
+                  <input
+                    type="text" placeholder="CVV" value={formData.cvv}
+                    onChange={(e) => setFormData({...formData, cvv: e.target.value})}
+                    className="bg-zinc-950 border border-zinc-700 p-4 rounded-xl"
+                  />
+                </div>
+
+                <button
+                  onClick={handleCheckout}
+                  disabled={isCheckingOut}
+                  className="w-full mt-8 bg-red-600 hover:bg-red-700 py-7 text-2xl font-semibold rounded-2xl disabled:opacity-70"
+                >
+                  {isCheckingOut ? "Processing Payment..." : `Pay $${total.toFixed(2)}`}
+                </button>
+
+                <button 
+                  onClick={() => setShowCheckoutForm(false)}
+                  className="w-full text-zinc-400 hover:text-white"
+                >
+                  ← Back
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

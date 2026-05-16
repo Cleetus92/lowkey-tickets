@@ -5,20 +5,13 @@ import { Calendar, MapPin, Search, Guitar } from 'lucide-react';
 import Link from 'next/link';
 
 const allEvents = [
-  // Country / Americana
   { id: 1, title: "Oliver Anthony", date: "August 30, 2026", venue: "Joan Perry Brock Center", city: "Farmville, VA", price: 79, image: "https://picsum.photos/id/1015/800/600", genre: "Country" },
   { id: 2, title: "Tyler Childers", date: "July 12, 2026", venue: "Red Rocks Amphitheatre", city: "Morrison, CO", price: 65, image: "https://picsum.photos/id/1074/800/600", genre: "Country" },
   { id: 3, title: "Zach Bryan", date: "September 15, 2026", venue: "Madison Square Garden", city: "New York, NY", price: 89, image: "https://picsum.photos/id/201/800/600", genre: "Country" },
-  
-  // Bluegrass / Folk
   { id: 4, title: "Working Man's Revival", date: "June 20, 2026", venue: "Salt Shed", city: "Chicago, IL", price: 45, image: "https://picsum.photos/id/106/800/600", genre: "Bluegrass" },
   { id: 5, title: "Colter Wall", date: "July 25, 2026", venue: "The Fillmore", city: "San Francisco, CA", price: 55, image: "https://picsum.photos/id/133/800/600", genre: "Folk" },
-  
-  // Rock / Southern Rock
   { id: 6, title: "Chris Stapleton", date: "August 15, 2026", venue: "United Center", city: "Chicago, IL", price: 95, image: "https://picsum.photos/id/180/800/600", genre: "Southern Rock" },
   { id: 7, title: "Lynyrd Skynyrd Farewell Tour", date: "October 10, 2026", venue: "Ameris Bank Amphitheatre", city: "Atlanta, GA", price: 75, image: "https://picsum.photos/id/201/800/600", genre: "Southern Rock" },
-  
-  // Blues / Classic Rock
   { id: 8, title: "The Black Crowes", date: "July 18, 2026", venue: "House of Blues", city: "Chicago, IL", price: 60, image: "https://picsum.photos/id/251/800/600", genre: "Blues Rock" },
 ];
 
@@ -30,7 +23,7 @@ export default function Events() {
   const [maxPrice, setMaxPrice] = useState(150);
 
   const filteredEvents = allEvents.filter(event => {
-    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const matchesSearch = event.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                          event.city.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesGenre = selectedGenre === 'All' || event.genre === selectedGenre;
     const matchesPrice = event.price <= maxPrice;
@@ -39,26 +32,9 @@ export default function Events() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="border-b border-zinc-800 bg-zinc-900 sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Guitar className="w-9 h-9 text-red-600" />
-            <div>
-              <h1 className="text-4xl font-bold tracking-tighter">LOWKEY TICKETS</h1>
-              <p className="text-sm text-zinc-400 -mt-1">Real Music • Real Low Fees</p>
-            </div>
-          </div>
-          <nav className="flex gap-8 text-sm font-medium">
-            <Link href="/" className="hover:text-red-500">Home</Link>
-            <Link href="/events" className="text-red-500">All Events</Link>
-            <Link href="/my-tickets" className="hover:text-red-500">My Tickets</Link>
-          </nav>
-        </div>
-      </header>
-
       <div className="max-w-6xl mx-auto px-6 py-12">
         <h2 className="text-5xl font-bold mb-3">Find Your Next Show</h2>
-        <p className="text-zinc-400 mb-10">Flat $1.99 fee • Supporting real artists nationwide</p>
+        <p className="text-zinc-400 mb-10">$1.99 per ticket • No box office nonsense</p>
 
         {/* Filters */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 mb-12 grid md:grid-cols-4 gap-6">
@@ -126,6 +102,10 @@ export default function Events() {
           ))}
         </div>
       </div>
+
+      <footer className="py-12 text-center text-zinc-500 border-t border-zinc-800 mt-20">
+        Lowkey Tickets © 2026 • Built for blue-collar America • No box office nonsense
+      </footer>
     </div>
   );
 }
