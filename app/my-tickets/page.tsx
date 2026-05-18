@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Guitar, Calendar, MapPin, QrCode } from 'lucide-react';
 
@@ -12,11 +12,14 @@ interface Ticket {
   city: string;
   quantity: number;
   totalPaid: number;
-  fee?: number;           // Made optional
+  fee?: number;
   purchaseDate: string;
+  buyerName?: string;
+  buyerEmail?: string;
 }
 
-export default function MyTickets() {
+// Inner component that uses useSearchParams
+function MyTicketsContent() {
   const searchParams = useSearchParams();
   const [tickets, setTickets] = useState<Ticket[]>([]);
 
@@ -25,7 +28,8 @@ export default function MyTickets() {
     setTickets(savedTickets);
 
     if (searchParams.get('success')) {
-      alert("✅ Payment Successful! Your tickets have been added.");
+      // Optional success toast
+      console.log("Payment successful - tickets loaded");
     }
   }, [searchParams]);
 
@@ -89,5 +93,18 @@ export default function MyTickets() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Main exported component with Suspense boundary
+export default function MyTicketsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+        <div className="text-2xl">Loading your tickets...</div>
+      </div>
+    }>
+      <MyTicketsContent />
+    </Suspense>
   );
 }
