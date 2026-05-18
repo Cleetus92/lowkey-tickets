@@ -19,6 +19,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     };
 
     window.addEventListener('beforeinstallprompt', handler);
+
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
@@ -26,7 +27,9 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setShowInstallButton(false);
+    if (outcome === 'accepted') {
+      setShowInstallButton(false);
+    }
     setDeferredPrompt(null);
   };
 
@@ -34,7 +37,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
   return (
     <>
-      {/* Global Header */}
       <header className="border-b border-zinc-800 bg-zinc-900 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -45,76 +47,39 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
             </div>
           </div>
 
-          {/* Hamburger Button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="text-white p-2 focus:outline-none"
+            className="text-white p-2"
           >
             {menuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
           </button>
         </div>
 
-        {/* Dropdown Menu with Smooth Slide Animation */}
-        <div 
-          className={`overflow-hidden transition-all duration-300 ease-in-out bg-zinc-900 border-t border-zinc-800 ${
-            menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
+        {/* Mobile Menu */}
+        <div className={`overflow-hidden transition-all duration-300 ease-in-out bg-zinc-900 border-t border-zinc-800 ${menuOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col gap-6 text-lg">
-            <Link 
-              href="/" 
-              onClick={() => setMenuOpen(false)} 
-              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
-            >
-              Home
-            </Link>
-            <Link 
-              href="/events" 
-              onClick={() => setMenuOpen(false)} 
-              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/events') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
-            >
-              All Events
-            </Link>
-            <Link 
-              href="/my-tickets" 
-              onClick={() => setMenuOpen(false)} 
-              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/my-tickets') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
-            >
-              My Tickets
-            </Link>
-            <Link 
-              href="/artist" 
-              onClick={() => setMenuOpen(false)} 
-              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/artist') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
-            >
-              For Artists
-            </Link>
-            <Link 
-              href="/legal" 
-              onClick={() => setMenuOpen(false)} 
-              className={`py-3 px-4 rounded-xl transition-colors ${isActive('/legal') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}
-            >
-              Legal
-            </Link>
+            <Link href="/" onClick={() => setMenuOpen(false)} className={`py-3 px-4 rounded-xl transition-colors ${isActive('/') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}>Home</Link>
+            <Link href="/events" onClick={() => setMenuOpen(false)} className={`py-3 px-4 rounded-xl transition-colors ${isActive('/events') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}>All Events</Link>
+            <Link href="/my-tickets" onClick={() => setMenuOpen(false)} className={`py-3 px-4 rounded-xl transition-colors ${isActive('/my-tickets') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}>My Tickets</Link>
+            <Link href="/artist" onClick={() => setMenuOpen(false)} className={`py-3 px-4 rounded-xl transition-colors ${isActive('/artist') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}>For Artists</Link>
+            <Link href="/legal" onClick={() => setMenuOpen(false)} className={`py-3 px-4 rounded-xl transition-colors ${isActive('/legal') ? 'text-red-500 bg-zinc-800' : 'text-zinc-300 hover:bg-zinc-800'}`}>Legal</Link>
           </div>
         </div>
       </header>
 
       {children}
 
-      {/* Install Button */}
+      {/* Improved PWA Install Button */}
       {showInstallButton && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-zinc-900 border border-red-600 rounded-2xl p-5 shadow-2xl z-50 max-w-[90%] w-full max-w-sm">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
           <button
             onClick={handleInstall}
-            className="flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 w-full py-4 rounded-xl text-white font-semibold text-lg"
+            className="flex items-center gap-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 px-8 py-4 rounded-2xl text-white font-semibold shadow-2xl shadow-red-900/50 transition-all active:scale-95"
           >
             <Download className="w-6 h-6" />
             Install Lowkey Tickets
           </button>
-          <p className="text-center text-xs text-zinc-400 mt-3">
-            Add to home screen for quick access
-          </p>
+          <p className="text-center text-xs text-zinc-400 mt-3">Add to home screen for quick access</p>
         </div>
       )}
     </>

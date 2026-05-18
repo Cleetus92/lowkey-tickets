@@ -4,7 +4,7 @@ import ClientLayout from './ClientLayout';
 
 export const metadata: Metadata = {
   title: 'Lowkey Tickets',
-  description: 'Real Music. Real Low Fees. $1.99 per ticket.',
+  description: 'Real Music. Real Low Fees. $1.99 per ticket. Built for blue-collar America.',
   icons: {
     icon: '/favicon.ico',
   },
@@ -20,10 +20,8 @@ export default function RootLayout({
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#B91C1C" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
       </head>
-      <body>
+      <body className="bg-zinc-950 text-white">
         <ClientLayout>{children}</ClientLayout>
       </body>
     </html>

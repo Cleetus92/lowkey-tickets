@@ -1,12 +1,11 @@
 {
   "name": "Lowkey Tickets",
   "short_name": "Lowkey",
-  "description": "Real Music. Real Low Fees. $1.99 flat fee.",
+  "description": "Real Music. Real Low Fees. $1.99 per ticket.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F0F0F",
+  "background_color": "#18181b",
   "theme_color": "#B91C1C",
-  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "/icon-192.png",
